@@ -1,27 +1,41 @@
 import { NextPage } from '@/next.types';
+import { useAuthService } from '@/services/Authentication';
 import { Field, Formik, Form, FormikHelpers } from 'formik';
 import Link from 'next/link';
 
-interface ICreateAccountPage {}
+interface ISignUpPage {}
 
-interface CreateAccountFormValues {
+interface SignUpFormValues {
   email: string;
   password: string;
   passwordConfirmation: string;
 }
 
-const CreateAccountPage: NextPage<ICreateAccountPage> = (props) => {
-  const handleOnSubmit = (
-    values: CreateAccountFormValues,
-    { setSubmitting }: FormikHelpers<CreateAccountFormValues>
-  ) => {};
+const SignUpPage: NextPage<ISignUpPage> = (props) => {
+  const authService = useAuthService();
+
+  const handleOnSubmit = async (
+    values: SignUpFormValues,
+    { setSubmitting }: FormikHelpers<SignUpFormValues>
+  ) => {
+    try {
+      setSubmitting(true);
+      // TODO: validate values
+      let credentials = await authService.signIn(values.email, values.password);
+      console.log(credentials);
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <main className='flex flex-1 justify-center items-center'>
       <div className=' w-full max-w-7xl p-8'>
         <div className='w-full card shadow-lg border border-base-300'>
           <div className='card-body gap-8'>
-            <h1 className=' w-full text-center text-xl'>Create Account</h1>
+            <h1 className=' w-full text-center text-4xl'>Login to TCGCMS</h1>
             <Formik
               initialValues={{
                 email: '',
@@ -56,18 +70,6 @@ const CreateAccountPage: NextPage<ICreateAccountPage> = (props) => {
                 </div>
 
                 <div className='form-control w-full'>
-                  <label className='label' htmlFor='passwordConfirmation'>
-                    <span className='label-text'>Confirm Password</span>
-                  </label>
-                  <Field
-                    id='passwordConfirmation'
-                    name='passwordConfirmation'
-                    className='input input-bordered w-full'
-                    type='password'
-                  />
-                </div>
-
-                <div className='form-control w-full'>
                   <button type='submit' className='btn btn-primary'>
                     Submit
                   </button>
@@ -84,9 +86,9 @@ const CreateAccountPage: NextPage<ICreateAccountPage> = (props) => {
             <div className='divider m-0' />
             <div className='flex justify-center'>
               <span>
-                Already have an account?
-                <Link href='/sign-in' className='link link-hover mx-1'>
-                  Sign In
+                Need an account?
+                <Link href='/signup' className='link link-hover mx-1'>
+                  Sign Up
                 </Link>
               </span>
               <div className='flex-grow'></div>
@@ -101,4 +103,4 @@ const CreateAccountPage: NextPage<ICreateAccountPage> = (props) => {
   );
 };
 
-export default CreateAccountPage;
+export default SignUpPage;
