@@ -1,9 +1,20 @@
-import { Auth } from 'firebase/auth';
+import { Result } from '../Core';
+import { UserCredential, UserInfo } from 'firebase/auth';
 
-export interface IAuthService {
-  signUp: (email: string, password: string) => Promise<UserCredential>;
-  signUpWithGoogle: () => void;
-  signIn: (email: string, password) => void;
-  signInWithGoogle: () => void;
-  signOut: () => Promise<void>;
+export interface IAuthentication {
+  signUpWithEmailAndPassword: (
+    email: string,
+    password: string
+  ) => Promise<Result<User>>;
+
+  signUpWithGoogle: () => Promise<Result<User>>;
+
+  loginWithEmailAndPassword: (
+    email: string,
+    password: string
+  ) => Promise<Result<User>>;
+
+  loginWithGoogle: () => Promise<Result<User>>;
+
+  logout: () => Promise<Result<void>>;
 }

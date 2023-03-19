@@ -1,62 +1,130 @@
-import { IAuthService } from './authentication.types';
+import { Result, StatusEnum } from '../Core';
+import { Auth } from '../Firebase';
+import { auth } from '../Firebase/firebase.service';
+import { IAuthentication } from './authentication.types';
 import {
-  Auth,
-  AuthCredential,
   createUserWithEmailAndPassword,
-  signInWithCredential,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
+  User,
   UserCredential,
 } from 'firebase/auth';
 
-class AuthService implements IAuthService {
-  #auth: Auth;
-  constructor(auth: Auth) {
-    this.#auth = auth || ({} as Auth);
+class Authentication implements IAuthentication {
+  readonly _auth: Auth;
+
+  constructor() {
+    this._auth = auth;
   }
 
-  signUp = async (email: string, password: string): Promise<UserCredential> => {
-    let credentials = {} as UserCredential;
+  signUpWithEmailAndPassword = (
+    email: string,
+    password: string
+  ): Promise<Result<User>> => {
+    let result = {} as Result<User>;
 
-    try {
-      credentials = await createUserWithEmailAndPassword(
-        this.#auth,
-        email,
-        password
-      );
-    } catch (error: any) {
-      // TODO: Implement Logging Service
-      console.error(error.code);
-    }
-
-    return credentials;
+    return new Promise((resolve, reject) => {
+      createUserWithEmailAndPassword(this._auth, email, password)
+        .then((value: UserCredential) => {
+          result.status = StatusEnum.SUCCESS;
+          result.data = value.user;
+        })
+        .catch((error: any) => {
+          console.error(`Authentication: ${error.code} - ${error.message}`);
+          result.status = StatusEnum.FAILURE;
+          result.error = error.message;
+        })
+        .finally(() => {
+          resolve(result);
+        });
+    });
   };
 
-  signUpWithGoogle = () => {};
+  signUpWithGoogle = (): Promise<Result<User>> => {
+    let result = {} as Result<User>;
+    return new Promise((resolve, reject) => {
+      let provider = new GoogleAuthProvider();
 
-  signIn = async (email: string, password: any): Promise<UserCredential> => {
-    let credentials = {} as UserCredential;
-    try {
-      credentials = await signInWithEmailAndPassword(
-        this.#auth,
-        email,
-        password
-      );
-    } catch (error: any) {
-      console.log(error);
-    }
-    return credentials;
+      signInWithPopup(this._auth, provider)
+        .then((value: UserCredential) => {
+          result.status = StatusEnum.SUCCESS;
+          result.data = value.user;
+        })
+        .catch((error: any) => {
+          console.error(`Authentication: ${error.code} - ${error.message}`);
+          result.status = StatusEnum.FAILURE;
+          result.error = error.message;
+        })
+        .finally(() => {
+          resolve(result);
+        });
+    });
   };
 
-  signInWithGoogle = () => {};
+  loginWithEmailAndPassword = (
+    email: string,
+    password: string
+  ): Promise<Result<UserCredential>> => {
+    let result = {} as Result<UserCredential>;
+    return new Promise((resolve, rejects) => {
+      signInWithEmailAndPassword(this._auth, email, password)
+        .then((value: UserCredential) => {
+          result.status = StatusEnum.SUCCESS;
+          result.data = value;
+        })
+        .catch((error: any) => {
+          console.error(`Authentication: ${error.code} - ${error.message}`);
+          result.status = StatusEnum.FAILURE;
+          result.error = error.message;
+        })
+        .finally(() => {
+          resolve(result);
+        });
+    });
+  };
 
-  signOut = async (): Promise<void> => {
-    try {
-      await signOut(this.#auth);
-    } catch (error: any) {
-      console.log(error);
-    }
+  loginWithGoogle = (): Promise<Result<User>> => {
+    let result = {} as Result<User>;
+    return new Promise((resolve, reject) => {
+      let provider = new GoogleAuthProvider();
+
+      signInWithPopup(this._auth, provider)
+        .then((value: UserCredential) => {
+          result.status = StatusEnum.SUCCESS;
+          result.data = value.user;
+        })
+        .catch((error: any) => {
+          console.error(`Authentication: ${error.code} - ${error.message}`);
+          result.status = StatusEnum.FAILURE;
+          result.error = error.message;
+        })
+        .finally(() => {
+          resolve(result);
+        });
+    });
+  };
+
+  logout = (): Promise<Result<void>> => {
+    let result = {} as Result<void>;
+    return new Promise((resolve, rejects) => {
+      signOut(this._auth)
+        .then(() => {
+          result.status = StatusEnum.SUCCESS;
+        })
+        .catch((error) => {
+          console.error(`Authentication: ${error.code} - ${error.message}`);
+          result.status = StatusEnum.FAILURE;
+          result.error = error.message;
+        })
+        .then(() => {
+          resolve(result);
+        });
+    });
   };
 }
 
-export default AuthService;
+const AuthenticationService = new Authentication();
+
+export default AuthenticationService;

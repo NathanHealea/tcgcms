@@ -1,5 +1,6 @@
+import { GoogleIcon } from '@/components/Icons';
 import { NextPage } from '@/next.types';
-import { useAuthService } from '@/services/Authentication';
+import { useAuth } from '@/services/Authentication';
 import { Field, Formik, Form, FormikHelpers } from 'formik';
 import Link from 'next/link';
 
@@ -12,27 +13,31 @@ interface SignUpFormValues {
 }
 
 const SignUpPage: NextPage<ISignUpPage> = (props) => {
-  const authService = useAuthService();
+  const authService = useAuth();
 
   const handleOnSubmit = async (
     values: SignUpFormValues,
     { setSubmitting }: FormikHelpers<SignUpFormValues>
   ) => {
-    try {
-      setSubmitting(true);
-      // TODO: validate values
-      let credentials = await authService.signIn(values.email, values.password);
-      console.log(credentials);
-    } catch (error: any) {
-      console.log(error);
-    } finally {
-      setSubmitting(false);
-    }
+    setSubmitting(true);
+    // TODO: validate values
+    let error = await authService.loginWithEmailAndPassword(
+      values.email,
+      values.password
+    );
+
+    console.log(error);
+
+    setSubmitting(false);
+  };
+  const handleLoginWithGoogle = async () => {
+    let error = await authService.loginWithGoogle();
+    console.log(error);
   };
 
   return (
     <main className='flex flex-1 justify-center items-center'>
-      <div className=' w-full max-w-7xl p-8'>
+      <div className=' w-full max-w-4xl p-8'>
         <div className='w-full card shadow-lg border border-base-300'>
           <div className='card-body gap-8'>
             <h1 className=' w-full text-center text-4xl'>Login to TCGCMS</h1>
@@ -78,10 +83,14 @@ const SignUpPage: NextPage<ISignUpPage> = (props) => {
             </Formik>
             <div className='divider m-0'>OR</div>
             <div className='flex justify-center gap-4 flex-wrap'>
-              <div className='btn btn-outline btn-circle'></div>
-              <div className='btn btn-outline btn-circle'></div>
-              <div className='btn btn-outline btn-circle'></div>
-              <div className='btn btn-outline btn-circle'></div>
+              <button
+                onClick={handleLoginWithGoogle}
+                type='button'
+                className='btn btn-outline'
+              >
+                <GoogleIcon className='mr-4' />
+                Login with Google
+              </button>
             </div>
             <div className='divider m-0' />
             <div className='flex justify-center'>

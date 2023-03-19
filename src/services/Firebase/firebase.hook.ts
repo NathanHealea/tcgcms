@@ -1,17 +1,6 @@
-import { app, auth } from './firebase.service';
-import { FirebaseApp } from 'firebase/app';
-import { Auth } from 'firebase/auth';
+import * as Firebase from './firebase.service';
+import { IFirebaseService } from './firebase.types';
 
-type FirebaseService = {
-  app: FirebaseApp;
-  auth: Auth;
-};
+const useFirebase = (): IFirebaseService => Firebase;
 
-const useFirebaseService = (): FirebaseService => {
-  return {
-    app,
-    auth,
-  };
-};
-
-export default useFirebaseService;
+export default useFirebase;

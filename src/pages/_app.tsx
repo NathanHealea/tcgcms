@@ -1,5 +1,7 @@
 import { NextPage, AppProps } from '../next.types';
 import '../styles/globals.css';
+import MainLayout from '@/layouts/Main/main.layout';
+import { AuthProvider } from '@/services/Authentication';
 import { FC } from 'react';
 
 /**
@@ -22,7 +24,11 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   const renderPageLayout =
     (hasPageLayout(Component) && Component.getLayout) || ((page: any) => page);
 
-  return renderPageLayout(<Component {...pageProps} />);
+  return (
+    <AuthProvider>
+      <MainLayout>{renderPageLayout(<Component {...pageProps} />)}</MainLayout>
+    </AuthProvider>
+  );
 };
 
 export default App;
