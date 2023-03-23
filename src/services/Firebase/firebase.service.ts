@@ -1,4 +1,4 @@
-import { Auth, FirebaseApp, IFirebaseService } from './firebase.types';
+import { IFirebaseService } from './firebase.types';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
@@ -14,3 +14,12 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+const initialize = (): IFirebaseService => {
+  return {
+    app,
+    auth,
+  };
+};
+
+export default initialize;

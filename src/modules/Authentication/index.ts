@@ -1,4 +1,5 @@
 // Service Export
+export { default as AuthenticationService } from './authentication.service';
 
 // Hook Export
 

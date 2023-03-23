@@ -11,7 +11,7 @@ export type BasicCredentials = {
 /**
  * Registration with @see Basic credentials
  */
-export type Registration<T = Basic> = {
+export type Registration<T> = {
   username: string;
   firstName: string;
   lastName: string;
@@ -40,9 +40,9 @@ export interface IAuthProvider {
  * Interface for Authentication Service
  */
 interface IAuthentication {
-  signUp<T>(): (registration: Registration, credentials: T) => Promise<User>;
-  signUpWithProvider<T = null, P extends IAuthProvider>(): (
-    registration: Registration<T>,
-    provider: P
+  signUp: (registration: Registration<BasicCredentials>) => Promise<User>;
+  signUpWithProvider: (
+    registration: Registration<null>,
+    provider: IAuthProvider
   ) => Promise<User>;
 }

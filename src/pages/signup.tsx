@@ -1,4 +1,5 @@
 import { GoogleIcon } from '@/components/Icons';
+import { AuthenticationService } from '@/modules/Authentication';
 import { NextPage } from '@/next.types';
 import { useAuth } from '@/services/Authentication';
 import { Field, Formik, Form, FormikHelpers } from 'formik';
@@ -22,12 +23,24 @@ const SignUpPage: NextPage<ISignUpPage> = (props) => {
   ) => {
     setSubmitting(true);
     // TODO: validate values
-    let error = await authService.signUpWithEmailAndPassword(
-      values.email,
-      values.password
-    );
+    // let error = await authService.signUpWithEmailAndPassword(
+    //   values.email,
+    //   values.password
+    // );
 
-    console.log(error);
+    const auth = AuthenticationService();
+
+    const user = await auth.signUp({
+      username: 'test',
+      firstName: '',
+      lastName: '',
+      credentials: {
+        email: values.email,
+        password: values.password,
+      },
+    });
+
+    console.log(user);
 
     setSubmitting(false);
   };
